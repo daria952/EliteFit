@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Трекер продуктов и калорий с прогрессом</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap');
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #0a0a0a;
+      color: #ffffff;
+      margin: 0;
+      padding: 20px 10px 40px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .card-gradient {
+      background: linear-gradient(145deg, #1e1e1e 0%, #2a2a2a 100%);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      border-radius: 20px;
+    }
+
+    form.card-gradient {
+      padding: 30px 25px;
+      max-width: 700px;
+      margin: 0 auto 30px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #ddd;
+    }
+
+    select, input[type="number"], input[type="text"] {
+      width: 100%;
+      background: #1a1a1a;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: white;
+      font-size: 16px;
+      box-sizing: border-box;
+      transition: 0.3s;
+      outline: none;
+    }
+
+    select:focus, input[type="number"]:focus, input[type="text"]:focus {
+      box-shadow: 0 0 8px #f9cb28;
+      border: 1px solid #f9cb28;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    button.btn-primary {
+      width: 100%;
+      padding: 14px 0;
+      font-weight: 700;
+      font-size: 18px;
+      color: black;
+      background: linear-gradient(90deg, #ff4d4d 0%, #f9cb28 100%);
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button.btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(249, 203, 40, 0.4);
+    }
+
+    .table-container {
+      max-width: 900px;
+      margin: 0 auto 40px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    thead tr {
+      border-bottom: 2px solid #444;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #333;
+      transition: background-color 0.3s;
+    }
+
+    tbody tr:hover {
+      background-color: #222;
+    }
+
+    tfoot tr {
+      border-top: 2px solid #444;
+      font-weight: 700;
+      color: #f9cb28;
+      font-size: 18px;
+    }
+
+    .btn-delete {
+      background: none;
+      border: none;
+      color: #ff4d4d;
+      font-weight: 700;
+      font-size: 18px;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .btn-delete:hover {
+      color: #ff0000;
+    }
+
+    /* Прогресс-диаграмма */
+    .progress-container {
+      max-width: 300px;
+      margin: 0 auto 40px;
+      background: linear-gradient(145deg, #1e1e1e 0%, #2a2a2a 100%);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+    .progress-text {
+      font-weight: 700;
+      font-size: 20px;
+      margin-top: 15px;
+      color: #f9cb28;
+    }
+
+    .remaining-text {
+      font-size: 16px;
+      margin-top: 8px;
+      color: #f9cb28;
+    }
+
+    .remaining-text.over-limit {
+      color: #ff4d4d;
+    }
+
+    /* Рекомендации */
+    .recommendations {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .recommendation {
+      flex: 1 1 260px;
+      background: linear-gradient(145deg, #1e1e1e 0%, #2a2a2a 100%);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+      padding: 20px;
+      font-weight: 600;
+      text-align: center;
+      cursor: default;
+      transition: all 0.3s ease;
+    }
+
+    .recommendation:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    }
+
+    .nav-link {
+      position: relative;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -5px;
+      left: 0;
+      background: linear-gradient(90deg, #ff4d4d 0%, #f9cb28 100%);
+      transition: width 0.3s;
+    }
+    
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    
+    /* Стили для блока установки цели */
+    .goal-container {
+      max-width: 700px;
+      margin: 0 auto 30px;
+      padding: 25px;
+    }
+    
+    .goal-input {
+      background: #1a1a1a;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: white;
+      font-size: 18px;
+      text-align: center;
+      width: 120px;
+      margin: 0 10px;
+    }
+    
+    .goal-btn {
+      padding: 12px 24px;
+      font-weight: 700;
+      font-size: 16px;
+      color: black;
+      background: linear-gradient(90deg, #ff4d4d 0%, #f9cb28 100%);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .goal-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(249, 203, 40, 0.4);
+    }
+
+
+     @media (max-width: 768px) {
+    body {
+      padding: 10px 5px 20px;
+    }
+    
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+    }
+    
+    .grid-3 {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    
+    form.card-gradient {
+      padding: 20px 15px;
+    }
+    
+    select, input[type="number"], input[type="text"] {
+      padding: 12px 14px;
+      font-size: 16px;
+    }
+    
+    button.btn-primary {
+      padding: 16px 0;
+      font-size: 16px;
+    }
+    
+    .table-container {
+      margin: 0 auto 20px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    table {
+      font-size: 14px;
+      min-width: 600px;
+    }
+    
+    th, td {
+      padding: 8px 10px;
+    }
+    
+    .progress-container {
+      max-width: 100%;
+      padding: 15px;
+    }
+    
+    .goal-container {
+      padding: 15px;
+    }
+    
+    .goal-input {
+      width: 100%;
+      margin: 0 0 10px 0;
+    }
+    
+    .goal-btn {
+      width: 100%;
+    }
+    
+    .recommendation {
+      flex: 1 1 100%;
+    }
+    
+    /* Мобильное меню */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      background: #111;
+      padding: 15px;
+      z-index: 100;
+      border-bottom: 1px solid #333;
+    }
+    
+    .mobile-menu.active {
+      display: block;
+    }
+    
+    .mobile-menu a {
+      display: block;
+      padding: 10px 0;
+      color: white;
+      text-decoration: none;
+      border-bottom: 1px solid #222;
+    }
+    
+    .mobile-menu a:last-child {
+      border-bottom: none;
+    }
+
+  }
+  </style>
+</head>
+<body>
+
+<!-- Навигация -->
+    <nav class="bg-black py-3 px-6 sticky top-0 z-50 border-b border-gray-800">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-fire text-yellow-500 text-xl"></i>
+            <span class="text-xl font-bold bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent">EliteFit</span>
+        </div>
+        <div class="hidden md:flex space-x-6">
+            <a href="index.html" class="nav-link text-white hover:text-yellow-400">Главная</a>
+            <a href="index.html#calculator" class="nav-link text-white hover:text-yellow-400">Калькулятор</a>
+            <a href="index.html#nutrition" class="nav-link text-white hover:text-yellow-400">Питание</a>
+            <a href="food.html" class="nav-link text-white hover:text-yellow-400">Еда за день</a>
+            <a href="index.html#workouts" class="nav-link text-white hover:text-yellow-400">Тренировки</a>
+            <a href="index.html#personal-approach" class="nav-link text-white hover:text-yellow-400 transition duration-300">Сообщество</a>
+        </div>
+        <button class="md:hidden text-white">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+    </div>
+</nav>
+ 
+
+<!-- Увеличенный отступ до заголовка -->
+<div class="mt-10"></div>
+
+  <h2 class="text-4xl font-bold mb-6">
+    <span style="background: linear-gradient(90deg, #ff4d4d 0%, #f9cb28 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Трекер
+    </span>
+    продуктов и калорий
+  </h2>
+
+  <!-- Блок установки суточной нормы -->
+  <div class="card-gradient goal-container">
+    <h3 class="text-2xl font-bold mb-4 text-center">Ваша суточная норма калорий</h3>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <input type="number" id="dailyGoalInput" min="1000" max="5000" step="50" value="1500" 
+             class="goal-input">
+      <button id="setGoalBtn" class="goal-btn">
+        <i class="fas fa-check mr-2"></i>Установить
+      </button>
+    </div>
+    <p class="text-gray-400 text-sm text-center mt-3">Рекомендуемые значения: 1500-2500 ккал/день</p>
+  </div>
+
+  <!-- Форма добавления продуктов -->
+  <form id="productForm" class="card-gradient">
+    <div class="grid-3">
+      <div>
+        <label for="productSelect">Название продукта</label>
+        <select id="productSelect" required>
+          <option value="" selected disabled>Выберите продукт</option>
+          <option value="Овсянка">Овсянка</option>
+          <option value="Куриное филе">Куриное филе</option>
+          <option value="Яблоко">Яблоко</option>
+          <option value="Молоко">Молоко</option>
+          <option value="Творог">Творог</option>
+          <option value="Рис">Рис</option>
+          <option value="Гречка">Гречка</option>
+          <option value="Банан">Банан</option>
+          <option value="Яйцо">Яйцо</option>
+          <option value="Авокадо">Авокадо</option>
+          <option value="Лосось">Лосось</option>
+          <option value="Огурец">Огурец</option>
+          <option value="Помидор">Помидор</option>
+          <option value="Брокколи">Брокколи</option>
+          <option value="Миндаль">Миндаль</option>
+          <option value="Фундук">Фундук</option>
+          <option value="Кефир">Кефир</option>
+          <option value="Чечевица">Чечевица</option>
+          <option value="Груша">Груша</option>
+          <option value="Сыр">Сыр</option>
+          <option value="Тунец">Тунец</option>
+          <option value="Индейка">Индейка</option>
+          <option value="Киви">Киви</option>
+          <option value="Морковь">Морковь</option>
+          <option value="Финики">Финики</option>
+        </select>
+      </div>
+      <div>
+        <label for="productCalories">Калории на 100 г</label>
+        <input type="number" id="productCalories" min="0" step="1" placeholder="Ккал" required readonly />
+      </div>
+      <div>
+        <label for="productWeight">Вес съеденного (г)</label>
+        <input type="number" id="productWeight" min="1" step="1" placeholder="Граммы" required />
+      </div>
+    </div>
+    <button type="submit" class="btn-primary">
+      <i class="fas fa-plus-circle mr-2"></i>Добавить продукт
+    </button>
+  </form>
+
+  <!-- Таблица продуктов -->
+  <div class="card-gradient table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Продукт</th>
+          <th>Калории на 100 г</th>
+          <th>Вес (г)</th>
+          <th>Калории всего</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody id="productTableBody"></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" style="text-align: right;">Итого калорий:</td>
+          <td id="totalCalories">0</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- Прогресс-диаграмма -->
+  <section class="progress-container">
+    <canvas id="calorieProgressChart" width="250" height="250"></canvas>
+    <div class="progress-text" id="progressText">0 из 1500 ккал</div>
+    <div class="remaining-text" id="remainingText">Осталось: 1500 ккал</div>
+  </section>
+
+  <!-- Рекомендации -->
+  <section class="recommendations">
+    <div class="recommendation">🚰 Пейте 8 стаканов воды в день</div>
+    <div class="recommendation">🚶‍♂️ Ходите минимум 10 000 шагов</div>
+    <div class="recommendation">🛏️ Спите не менее 7 часов</div>
+    <div class="recommendation">🥦 Включайте больше овощей в рацион</div>
+  </section>
+
+<script>
+  // База данных калорийности продуктов
+  const calTable = {
+    'Овсянка': 370,
+    'Куриное филе': 165,
+    'Яблоко': 52,
+    'Молоко': 42,
+    'Творог': 120,
+    'Рис': 340,
+    'Гречка': 330,
+    'Банан': 89,
+    'Яйцо': 155,
+    'Авокадо': 160,
+    'Лосось': 208,
+    'Огурец': 16,
+    'Помидор': 18,
+    'Брокколи': 34,
+    'Миндаль': 576,
+    'Фундук': 628,
+    'Кефир': 40,
+    'Чечевица': 353,
+    'Груша': 57,
+    'Сыр': 350,
+    'Тунец': 132,
+    'Индейка': 145,
+    'Киви': 61,
+    'Морковь': 35,
+    'Финики': 277
+  };
+
+  // Получаем элементы DOM
+  const productSelect = document.getElementById('productSelect');
+  const productCalories = document.getElementById('productCalories');
+  const productWeight = document.getElementById('productWeight');
+  const productForm = document.getElementById('productForm');
+  const productTableBody = document.getElementById('productTableBody');
+  const totalCaloriesElem = document.getElementById('totalCalories');
+  const progressText = document.getElementById('progressText');
+  const remainingText = document.getElementById('remainingText');
+  const dailyGoalInput = document.getElementById('dailyGoalInput');
+  const setGoalBtn = document.getElementById('setGoalBtn');
+
+  // Инициализация переменных
+  let products = [];
+  let goalCalories = 1500;
+
+  // Установка новой цели по калориям
+  setGoalBtn.addEventListener('click', () => {
+    const newGoal = parseInt(dailyGoalInput.value);
+    if (isNaN(newGoal) || newGoal < 1000 || newGoal > 5000) {
+      alert('Пожалуйста, введите значение от 1000 до 5000 ккал');
+      return;
+    }
+    goalCalories = newGoal;
+    updateProgress();
+    saveToLocalStorage();
+    
+    // Показываем уведомление об успешном изменении
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg';
+    notification.innerHTML = `<i class="fas fa-check-circle mr-2"></i>Цель обновлена: ${goalCalories} ккал`;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+      setTimeout(() => notification.remove(), 500);
+    }, 2000);
+  });
+
+  // Автозаполнение калорий при выборе продукта
+  productSelect.addEventListener('change', () => {
+    const selected = productSelect.value;
+    productCalories.value = calTable[selected] || '';
+  });
+
+  // Рендер таблицы продуктов
+  function renderProducts() {
+    productTableBody.innerHTML = '';
+    let totalCalories = 0;
+
+    products.forEach((product, index) => {
+      const caloriesForWeight = (product.caloriesPer100g * product.weight) / 100;
+      totalCalories += caloriesForWeight;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${product.name}</td>
+        <td>${product.caloriesPer100g} ккал</td>
+        <td>${product.weight} г</td>
+        <td>${caloriesForWeight.toFixed(1)} ккал</td>
+        <td><button class="btn-delete" title="Удалить продукт" onclick="removeProduct(${index})">&#128465;</button></td>
+      `;
+      productTableBody.appendChild(tr);
+    });
+
+    totalCaloriesElem.textContent = totalCalories.toFixed(1);
+    updateProgress(totalCalories);
+  }
+
+  // Удаление продукта
+  function removeProduct(index) {
+    products.splice(index, 1);
+    renderProducts();
+    saveToLocalStorage();
+  }
+
+  // Добавление нового продукта
+  productForm.addEventListener('submit', e => {
+    e.preventDefault();
+
+    const name = productSelect.value;
+    const caloriesPer100g = parseFloat(productCalories.value);
+    const weight = parseFloat(productWeight.value);
+
+    if (!name) {
+      alert('Выберите продукт');
+      return;
+    }
+    if (isNaN(caloriesPer100g) || caloriesPer100g <= 0) {
+      alert('Калории должны быть положительным числом');
+      return;
+    }
+    if (isNaN(weight) || weight <= 0) {
+      alert('Вес должен быть положительным числом');
+      return;
+    }
+
+    products.push({name, caloriesPer100g, weight});
+    productForm.reset();
+    productCalories.value = '';
+    renderProducts();
+    saveToLocalStorage();
+  });
+
+  // Инициализация диаграммы прогресса
+  const ctxProgress = document.getElementById('calorieProgressChart').getContext('2d');
+  let progressChart = new Chart(ctxProgress, {
+    type: 'doughnut',
+    data: {
+      labels: ['Съедено', 'Остаток'],
+      datasets: [{
+        data: [0, goalCalories],
+        backgroundColor: ['#ff4d4d', '#444444'],
+        borderWidth: 0,
+        cutout: '80%',
+      }]
+    },
+    options: {
+      responsive: false,
+      plugins: {
+        legend: { display: false }
+      },
+      circumference: 360,
+      rotation: -90,
+      animation: { duration: 600 }
+    }
+  });
+
+  // Обновление прогресса
+  function updateProgress(currentCalories = 0) {
+    if(currentCalories > goalCalories) currentCalories = goalCalories;
+    
+    // Обновляем диаграмму
+    progressChart.data.datasets[0].data[0] = currentCalories;
+    progressChart.data.datasets[0].data[1] = goalCalories - currentCalories;
+    progressChart.update();
+
+    // Обновляем текстовую информацию
+    progressText.textContent = `${currentCalories.toFixed(1)} из ${goalCalories} ккал`;
+    
+    const remaining = goalCalories - currentCalories;
+    remainingText.textContent = `Осталось: ${remaining > 0 ? remaining.toFixed(1) : 0} ккал`;
+    
+    // Меняем стили при превышении лимита
+    if (remaining < 0) {
+      remainingText.classList.add('over-limit');
+      remainingText.classList.remove('remaining-text');
+    } else {
+      remainingText.classList.add('remaining-text');
+      remainingText.classList.remove('over-limit');
+    }
+  }
+
+  // Сохранение данных в localStorage
+  function saveToLocalStorage() {
+    const data = {
+      products,
+      goalCalories
+    };
+    localStorage.setItem('calorieTrackerData', JSON.stringify(data));
+  }
+
+  // Загрузка данных из localStorage
+  function loadFromLocalStorage() {
+    const savedData = localStorage.getItem('calorieTrackerData');
+    if (savedData) {
+      const data = JSON.parse(savedData);
+      products = data.products || [];
+      goalCalories = data.goalCalories || 1500;
+      dailyGoalInput.value = goalCalories;
+      renderProducts();
+    }
+  }
+
+  // Загрузка данных при старте
+  window.addEventListener('DOMContentLoaded', () => {
+    loadFromLocalStorage();
+  });
+
+  // Глобальные функции для вызова из HTML
+  window.removeProduct = removeProduct;
+
+  document.getElementById('mobileMenuButton').addEventListener('click', function() {
+    document.getElementById('mobileMenu').classList.toggle('active');
+  })
+</script>
+</body>
+</html>

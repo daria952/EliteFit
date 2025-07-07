@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EliteFit - Премиальный калькулятор калорий</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap');
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%);
+        }
+        
+        .card-gradient {
+            background: linear-gradient(145deg, #1e1e1e 0%, #2a2a2a 100%);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .card-gradient:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, #ff4d4d 0%, #f9cb28 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(249, 203, 40, 0.4);
+        }
+        
+        .counter {
+            font-size: 3rem;
+            background: linear-gradient(90deg, #ff4d4d 0%, #f9cb28 100%);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: linear-gradient(90deg, #ff4d4d 0%, #f9cb28 100%);
+            transition: width 0.3s;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: linear-gradient(90deg, #ff4d4d 0%, #f9cb28 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .btn-secondary {
+            background: #1f2937;
+            color: white;
+            border: 1px solid #4b5563;
+            transition: all 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background: #374151;
+            transform: translateY(-2px);
+        }
+
+        /* Мобильное меню */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            background: #111;
+            padding: 15px;
+            z-index: 100;
+            border-bottom: 1px solid #333;
+        }
+        
+        .mobile-menu.active {
+            display: block;
+        }
+        
+        .mobile-menu a {
+            display: block;
+            padding: 10px 0;
+            color: white;
+            text-decoration: none;
+            border-bottom: 1px solid #222;
+        }
+        
+        .mobile-menu a:last-child {
+            border-bottom: none;
+        }
+
+        /* Адаптация для мобильных */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 0;
+            }
+            
+            nav {
+                padding: 10px 15px;
+            }
+            
+            .hero-gradient, section {
+                padding: 40px 15px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+                line-height: 1.2;
+                margin-bottom: 20px;
+            }
+            
+            h2 {
+                font-size: 1.8rem;
+                margin-bottom: 15px;
+            }
+            
+            .grid-3 {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            form.card-gradient {
+                padding: 20px 15px;
+            }
+            
+            select, input[type="number"], input[type="text"] {
+                padding: 12px 14px;
+                font-size: 16px;
+            }
+            
+            button.btn-primary, button.btn-secondary {
+                padding: 14px 0;
+                font-size: 16px;
+                width: 100%;
+            }
+            
+            .flex.space-x-4 {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .table-container {
+                margin: 0 auto 20px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                width: 100%;
+            }
+            
+            table {
+                font-size: 14px;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+                white-space: nowrap;
+            }
+            
+            .progress-container {
+                max-width: 100%;
+                padding: 15px;
+            }
+            
+            .goal-container {
+                padding: 15px;
+            }
+            
+            .goal-input {
+                width: 100%;
+                margin: 0 0 10px 0;
+            }
+            
+            .goal-btn {
+                width: 100%;
+            }
+            
+            .recommendation {
+                flex: 1 1 100%;
+            }
+            
+            /* Видео адаптация */
+           
+            
+            /* Карточки тренировок */
+            .grid.md\:grid-cols-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Герой секция */
+            .max-w-7xl.mx-auto.grid.md\:grid-cols-2 {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .relative img {
+                width: 100%;
+                height: auto;
+            }
+            
+            .absolute.-bottom-6.-left-6 {
+                bottom: -20px;
+                left: 10px;
+                right: 10px;
+                width: auto;
+            }
+            
+            /* Калькулятор */
+            .grid.md\:grid-cols-2 {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            /* Навигация */
+            .hidden.md\:flex {
+                display: none;
+            }
+            
+            .mobile-menu-button {
+                display: block;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            p {
+                font-size: 0.9rem;
+            }
+            
+            .counter {
+                font-size: 2rem;
+            }
+            
+            .btn-primary, .btn-secondary {
+                font-size: 14px;
+                padding: 12px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+   <!-- Навигация -->
+    <nav class="bg-black py-3 px-6 sticky top-0 z-50 border-b border-gray-800">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-fire text-yellow-500 text-xl"></i>
+            <span class="text-xl font-bold bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent">EliteFit</span>
+        </div>
+        <div class="hidden md:flex space-x-6">
+            <a href="index.html" class="nav-link text-white hover:text-yellow-400">Главная</a>
+            <a href="#calculator" class="nav-link text-white hover:text-yellow-400">Калькулятор</a>
+            <a href="#nutrition" class="nav-link text-white hover:text-yellow-400">Питание</a>
+            <a href="food.html" class="nav-link text-white hover:text-yellow-400">Еда за день</a>
+            <a href="#workouts" class="nav-link text-white hover:text-yellow-400">Тренировки</a>
+            <a href="#personal-approach" class="nav-link text-white hover:text-yellow-400 transition duration-300">Сообщество</a>
+        </div>
+        <button id="mobileMenuButton" class="md:hidden text-white">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+    </div>
+</nav>
+
+<!-- Мобильное меню -->
+<div id="mobileMenu" class="mobile-menu">
+    <a href="index.html" class="nav-link text-white hover:text-yellow-400">Главная</a>
+    <a href="#calculator" class="nav-link text-white hover:text-yellow-400">Калькулятор</a>
+    <a href="#nutrition" class="nav-link text-white hover:text-yellow-400">Питание</a>
+    <a href="food.html" class="nav-link text-white hover:text-yellow-400">Еда за день</a>
+    <a href="#workouts" class="nav-link text-white hover:text-yellow-400">Тренировки</a>
+    <a href="#personal-approach" class="nav-link text-white hover:text-yellow-400 transition duration-300">Сообщество</a>
+</div>
+
+   <!-- Герой секция -->
+    <section id="home" class="hero-gradient py-20 px-6">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h1 class="text-4xl md:text-6xl font-bold mb-6">
+                    <span class="bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent">Премиальный</span><br>
+                    Калькулятор Калорий
+                </h1>
+                <p class="text-lg text-gray-300 mb-8">Достигайте своих фитнес-целей с точностью профессионала. Наш продвинутый калькулятор учитывает все параметры для идеального расчета вашей ежедневной нормы калорий.</p>
+                <div class="flex space-x-4">
+                    <a href="#calculator" class="btn-primary text-black font-bold py-3 px-8 rounded-full">Рассчитать сейчас</a>
+                    <a href="#video" class="border-2 border-yellow-400 text-yellow-400 font-bold py-3 px-8 rounded-full hover:bg-yellow-400 hover:text-black transition">Смотреть видео</a>
+                </div>
+            </div>
+            <div class="relative">
+                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                     alt="Фитнес модель"
+                     class="rounded-xl shadow-2xl floating w-full">
+                <div class="absolute -bottom-6 -left-6 bg-black p-4 rounded-xl shadow-lg">
+                    <div class="text-center">
+                        <div class="counter font-bold">5,000</div>
+                        <p class="text-gray-400">Довольных клиентов</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Калькулятор калорий -->
+   <section id="calculator" class="py-20 px-6 bg-black">
+    <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold mb-2 text-center">
+            <span class="bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent">Точный расчет</span> вашей нормы
+        </h2>
+        <p class="text-gray-400 text-center mb-12">Введите свои данные для персонализированного расчета</p>
+        
+        <div class="card-gradient rounded-2xl p-8">
+            <form id="calorieForm">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="block text-gray-300 mb-2">Пол</label>
+                        <div class="flex space-x-4">
+                            <label class="flex items-center">
+                                <input type="radio" name="gender" value="male" checked class="mr-2">
+                                <span>Мужской</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="gender" value="female" class="mr-2">
+                                <span>Женский</span>
+                            </label>
+                        </div>
+                    </div>
+                   
+                    <div>
+                        <label class="block text-gray-300 mb-2">Возраст</label>
+                        <input type="number" id="age" class="w-full bg-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400" placeholder="Лет">
+                    </div>
+                   
+                    <div>
+                        <label class="block text-gray-300 mb-2">Рост (см)</label>
+                        <input type="number" id="height" class="w-full bg-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400" placeholder="Сантиметры">
+                    </div>
+                   
+                    <div>
+                        <label class="block text-gray-300 mb-2">Вес (кг)</label>
+                        <input type="number" id="weight" class="w-full bg-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400" placeholder="Килограммы">
+                    </div>
+                   
+                    <div>
+                        <label class="block text-gray-300 mb-2">Уровень активности</label>
+                        <select id="activity" class="w-full bg-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                            <option value="1.2">Сидячий образ жизни</option>
+                            <option value="1.375">Легкая активность (1-3 тренировки в неделю)</option>
+                            <option value="1.55" selected>Умеренная активность (3-5 тренировок)</option>
+                            <option value="1.725">Высокая активность (6-7 тренировок)</option>
+                            <option value="1.9">Экстремальная активность (2+ тренировки в день)</option>
+                        </select>
+                    </div>
+                   
+                    <div>
+                        <label class="block text-gray-300 mb-2">Цель</label>
+                        <select id="goal" class="w-full bg-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                            <option value="maintain">Поддержание веса</option>
+                            <option value="lose" selected>Похудение</option>
+                            <option value="gain">Набор массы</option>
+                        </select>
+                    </div>
+                </div>
+               
+                <div class="flex space-x-4 mt-8">
+                    <button type="button" onclick="calculateCalories()" class="btn-primary flex-1 py-4 rounded-xl font-bold text-lg">
+                        Рассчитать мою норму
+                    </button>
+                    <button type="button" onclick="clearData()" class="btn-secondary flex-1 py-4 rounded-xl font-bold text-lg">
+                        Очистить данные
+                    </button>
+                </div>
+            </form>
+           
+            <div id="result" class="mt-8 hidden">
+                <div class="bg-gray-900 rounded-xl p-6">
+                    <h3 class="text-xl font-bold mb-4 text-yellow-400">Ваши результаты</h3>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-yellow-400" id="maintenance">0</div>
+                            <p class="text-gray-400">Поддержание веса</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-yellow-400" id="weightLoss">0</div>
+                            <p class="text-gray-400">Похудение</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-yellow-400" id="weightGain">0</div>
+                            <p class="text-gray-400">Набор массы</p>
+                        </div>
+                    </div>
+                   
+                    <div class="mt-6 table-container">
+                        <h4 class="font-bold mb-2">Рекомендации по макронутриентам</h4>
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-gray-700">
+                                    <th class="pb-2">Нутриент</th>
+                                    <th class="pb-2">Граммы</th>
+                                    <th class="pb-2">Калории</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-700">
+                                    <td class="py-3">Белки</td>
+                                    <td id="proteinGrams">0г</td>
+                                    <td id="proteinCals">0 ккал</td>
+                                </tr>
+                                <tr class="border-b border-gray-700">
+                                    <td class="py-3">Жиры</td>
+                                    <td id="fatGrams">0г</td>
+                                    <td id="fatCals">0 ккал</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3">Углеводы</td>
+                                    <td id="carbsGrams">0г</td>
+                                    <td id="carbsCals">0 ккал</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Загрузка сохраненных данных при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    loadSavedData();
+});
+
+function loadSavedData() {
+    const savedData = localStorage.getItem('calorieCalculatorData');
+    if (savedData) {
+        const data = JSON.parse(savedData);
+       
+        // Заполняем форму сохраненными значениями
+        if (data.gender) document.querySelector(`input[name="gender"][value="${data.gender}"]`).checked = true;
+        if (data.age) document.getElementById('age').value = data.age;
+        if (data.height) document.getElementById('height').value = data.height;
+        if (data.weight) document.getElementById('weight').value = data.weight;
+        if (data.activity) document.getElementById('activity').value = data.activity;
+        if (data.goal) document.getElementById('goal').value = data.goal;
+       
+        // Если есть результаты, показываем их
+        if (data.results) {
+            displayResults(data.results);
+        }
+    }
+}
+
+function saveData(formData, results) {
+    const dataToSave = {
+        ...formData,
+        results: results
+    };
+    localStorage.setItem('calorieCalculatorData', JSON.stringify(dataToSave));
+}
+
+function clearData() {
+    localStorage.removeItem('calorieCalculatorData');
+    document.getElementById('calorieForm').reset();
+    document.getElementById('result').classList.add('hidden');
+    alert('Данные очищены!');
+}
+
+function calculateCalories() {
+    // Получаем данные из формы
+    const gender = document.querySelector('input[name="gender"]:checked').value;
+    const age = parseInt(document.getElementById('age').value);
+    const height = parseInt(document.getElementById('height').value);
+    const weight = parseInt(document.getElementById('weight').value);
+    const activity = parseFloat(document.getElementById('activity').value);
+    const goal = document.getElementById('goal').value;
+
+    // Проверяем, что все поля заполнены
+    if (!age || !height || !weight) {
+        alert('Пожалуйста, заполните все поля');
+        return;
+    }
+
+    // Формируем объект с данными формы
+    const formData = {
+        gender,
+        age,
+        height,
+        weight,
+        activity,
+        goal
+    };
+
+    // Расчет калорий (формула Харриса-Бенедикта)
+    let bmr;
+    if (gender === 'male') {
+        bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+    } else {
+        bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+    }
+
+    const maintenance = Math.round(bmr * activity);
+    const weightLoss = Math.round(maintenance * 0.85);
+    const weightGain = Math.round(maintenance * 1.15);
+
+    // Расчет макронутриентов
+    const proteinGrams = Math.round(weight * 2); // 2г белка на кг веса
+    const proteinCals = proteinGrams * 4;
+   
+    const fatGrams = Math.round(weight * 0.8); // 0.8г жиров на кг веса
+    const fatCals = fatGrams * 9;
+   
+   let carbsCals, carbsGrams;
+if (goal === 'lose') {
+    carbsCals = (weightLoss - proteinCals - fatCals) * 0.9;
+} else if (goal === 'gain') {
+    carbsCals = (weightGain - proteinCals - fatCals) * 0.9;
+} else {
+    carbsCals = (maintenance - proteinCals - fatCals) * 0.9;
+}
+carbsGrams = carbsCals / 4;
+
+
+document.getElementById('carbsGrams').textContent = carbsGrams.toFixed(2) + 'г';
+document.getElementById('carbsCals').textContent = carbsCals.toFixed(2) + ' ккал';
+
+    // Формируем объект с результатами
+   const results = {
+    maintenance,
+    weightLoss,
+    weightGain,
+    proteinGrams,
+    proteinCals,
+    fatGrams,
+    fatCals,
+    carbsGrams: carbsGrams.toFixed(0),
+    carbsCals: carbsCals.toFixed(0)
+};
+
+    // Сохраняем данные
+    saveData(formData, results);
+
+    // Отображаем результаты
+    displayResults(results);
+}
+
+function displayResults(results) {
+    document.getElementById('maintenance').textContent = results.maintenance;
+    document.getElementById('weightLoss').textContent = results.weightLoss;
+    document.getElementById('weightGain').textContent = results.weightGain;
+   
+    document.getElementById('proteinGrams').textContent = results.proteinGrams + 'г';
+    document.getElementById('proteinCals').textContent = results.proteinCals + ' ккал';
+   
+    document.getElementById('fatGrams').textContent = results.fatGrams + 'г';
+    document.getElementById('fatCals').textContent = results.fatCals + ' ккал';
+   
+    document.getElementById('carbsGrams').textContent = results.carbsGrams + 'г';
+    document.getElementById('carbsCals').textContent = results.carbsCals + ' ккал';
+   
+    document.getElementById('result').classList.remove('hidden');
+    
+    // Прокрутка к результатам
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+   
+    <!-- О питании -->
+    <section id="nutrition" class="py-20 px-6 hero-gradient">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold mb-12 text-center">
+                <span class="bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent">Наука</span> о питании
+            </h2>
+           
+            <div class="grid md:grid-cols-2 gap-12 items-center mb-16">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">Почему подсчет калорий важен?</h3>
+                    <p class="text-gray-300 mb-6">Подсчет калорий - это фундаментальный принцип управления весом. Независимо от того, хотите ли вы похудеть, набрать массу или поддерживать текущий вес, понимание вашей ежедневной потребности в калориях является ключевым.</p>
+                   
+                    <ul class="space-y-3 mb-6">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-yellow-400 mt-1 mr-3"></i>
+                            <span>Точный контроль потребления энергии</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-yellow-400 mt-1 mr-3"></i>
+                            <span>Оптимизация состава тела (соотношение мышц и жира)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-yellow-400 mt-1 mr-3"></i>
+                            <span>Улучшение спортивных результатов</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-yellow-400 mt-1 mr-3"></i>
+                            <span>Долгосрочное поддержание здоровья</span>
+                        </li>
+                    </ul>
+                   
+                    <a href="food.html" class="btn-primary inline-block text-black font-bold py-3 px-8 rounded-full">Внести данные своего рациона</a>
+                </div>
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1453&q=80"
+                         alt="Здоровое питание"
+                         class="rounded-xl shadow-2xl w-full">
+                    <div class="absolute -bottom-6 -right-6 bg-black p-4 rounded-xl shadow-lg w-2/3">
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 bg-yellow-400 rounded-full mr-2"></div>
+                            <p class="text-sm">Здоровое питание - основа прогресса</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+            <div class="grid md:grid-cols-3 gap-8 mt-12">
+                <div class="card-gradient rounded-2xl p-6">
+                    <div class="text-yellow-400 text-3xl mb-4">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Для набора массы</h3>
+                    <p class="text-gray-300">Увеличьте потребление на 300-500 ккал сверх нормы с акцентом на белки и сложные углеводы.</p>
+                </div>
+               
+                <div class="card-gradient rounded-2xl p-6">
+                    <div class="text-yellow-400 text-3xl mb-4">
+                        <i class="fas fa-weight"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Для похудения</h3>
+                    <p class="text-gray-300">Создайте дефицит в 300-500 ккал, сохраняя высокое потребление белка для защиты мышц.</p>
+                </div>
+               
+                <div class="card-gradient rounded-2xl p-6">
+                    <div class="text-yellow-400 text-3xl mb-4">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Для поддержания</h3>
+                    <p class="text-gray-300">Придерживайтесь рассчитанной нормы, корректируя по мере изменения активности.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Видео секция -->
+    <section id="video" class="py-20 px-6 bg-black">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold mb-2 text-center">
+                <span class="bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent">Экспертное</span> руководство
+            </h2>
+            <p class="text-gray-400 text-center mb-12">Узнайте больше от наших профессиональных тренеров</p>
+           
+             <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="relative">
+                    <iframe width="100%" height="315" src="https://www.youtube.com/embed/L8piv-JfwFQ" title="Как рассчитать свою норму калорий? | Суточная норма" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    <div class="absolute -top-4 -left-4 bg-yellow-400 text-black font-bold py-2 px-4 rounded-full">
+                        Новое
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">Как правильно считать калории?</h3>
+                    <p class="text-gray-300 mb-6">В этом видео наш нутрициолог подробно объясняет:</p>
+                   
+                    <ul class="space-y-3 mb-6">
+                        <li class="flex items-start">
+                            <i class="fas fa-play text-yellow-400 mt-1 mr-3"></i>
+                            <span>Как точно взвешивать и учитывать продукты</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-play text-yellow-400 mt-1 mr-3"></i>
+                            <span>Лучшие приложения для учета калорий</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-play text-yellow-400 mt-1 mr-3"></i>
+                            <span>Как адаптировать питание под тренировки</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-play text-yellow-400 mt-1 mr-3"></i>
+                            <span>Частые ошибки и как их избежать</span>
+                        </li>
+                    </ul>
+                   
+                    <div class="flex items-center space-x-4">
+                        <a href="#" class="text-yellow-400 hover:text-yellow-300">
+                            <i class="fab fa-youtube text-2xl"></i>
+                        </a>
+                        <a href="#" class="text-yellow-400 hover:text-yellow-300">
+                            <i class="fab fa-instagram text-2xl"></i>
+                        </a>
+                        <a href="#" class="text-yellow-400 hover:text-yellow-300">
+                            <i class="fab fa-telegram text-2xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Тренировки -->
+      <section id="workouts" class="py-20 px-6 hero-gradient">
+    <div class="max-w-7xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold mb-2 text-center">
+            <span class="bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent">Тренировочные</span> программы
+        </h2>
+        <p class="text-gray-400 text-center mb-12">Подберите программу под свои цели и уровень подготовки</p>
+       
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Силовая тренировка -->
+            <div class="card-gradient rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-300">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                         alt="Силовая тренировка"
+                         class="w-full h-48 object-cover">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                        <h3 class="text-xl font-bold">Силовые тренировки</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-300 mb-4">Программа для набора мышечной массы с акцентом на базовые упражнения. Идеально подходит для увеличения силы и мышечного объема.</p>
+                    <ul class="space-y-2 mb-6">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">4-5 тренировок в неделю</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">Прогрессия нагрузок</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">Акцент на многосуставные движения</span>
+                        </li>
+                    </ul>                    
+                </div>
+            </div>
+           
+            <!-- Жиросжигание -->
+            <div class="card-gradient rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-300">
+                <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="Кардио тренировка" 
+                         class="w-full h-48 object-cover">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                        <h3 class="text-xl font-bold">Жиросжигание</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-300 mb-4">Комбинация HIIT и силовых тренировок для максимального сжигания жира. Подходит для тех, кто хочет снизить процент жира в организме.</p>
+                    <ul class="space-y-2 mb-6">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">5-6 тренировок в неделю</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">Интервальные тренировки</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">Круговая система</span>
+                        </li>
+                    </ul>                   
+                </div>
+            </div>
+            
+            <!-- Функциональный тренинг -->
+            <div class="card-gradient rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-300">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1538805060514-97d9cc17730c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80" 
+                         alt="Функциональный тренинг" 
+                         class="w-full h-48 object-cover">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                        <h3 class="text-xl font-bold">Функциональный тренинг</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-300 mb-4">Улучшает координацию, баланс и силу для повседневной жизни. Идеально для тех, кто хочет развить практичную силу и выносливость.</p>
+                    <ul class="space-y-2 mb-6">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">3-4 тренировки в неделю</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">Работа с собственным весом</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">Упражнения на стабилизацию</span>
+                        </li>
+                    </ul>                   
+                </div>
+            </div>
+            
+            <!-- Кроссфит -->
+            <div class="card-gradient rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-300">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="Кроссфит" 
+                         class="w-full h-48 object-cover">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                        <h3 class="text-xl font-bold">Кроссфит</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-300 mb-4">Высокоинтенсивные тренировки, сочетающие элементы тяжелой атлетики, гимнастики и кардио. Для тех, кто любит вызов.</p>
+                    <ul class="space-y-2 mb-6">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">4-5 тренировок в неделю</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">WOD (Workout of the Day)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">Разнообразие упражнений</span>
+                        </li>
+                    </ul>                  
+                </div>
+            </div>
+            
+            <!-- Йога и растяжка -->
+            <div class="card-gradient rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-300">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1545205597-3d9d02c29597?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="Йога" 
+                         class="w-full h-48 object-cover">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                        <h3 class="text-xl font-bold">Йога и растяжка</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-300 mb-4">Улучшает гибкость, мобильность суставов и психическое состояние. Отлично подходит для восстановления и релаксации.</p>
+                    <ul class="space-y-2 mb-6">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">3-7 занятий в неделю</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">Разные стили йоги</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">Дыхательные практики</span>
+                        </li>
+                    </ul>                   
+                </div>
+            </div>
+            
+            <!-- Тренировки для начинающих -->
+            <div class="card-gradient rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-300">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="Тренировки для начинающих" 
+                         class="w-full h-48 object-cover">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                        <h3 class="text-xl font-bold">Для начинающих</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-300 mb-4">Постепенное введение в тренировочный процесс с базовыми упражнениями. Идеально для новичков в фитнесе.</p>
+                    <ul class="space-y-2 mb-6">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">2-3 тренировки в неделю</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">Обучение технике</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-yellow-400 text-xs mt-1 mr-2"></i>
+                            <span class="text-sm">Постепенное увеличение нагрузки</span>
+                        </li>
+                    </ul>                    
+                </div>
+            </div>
+        </div>    
+        
+    </div>
+</section>
+
+    <!-- Сообщество -->
+    <section id="personal-approach" class="py-20 px-6 bg-black">
+    <div class="max-w-7xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold mb-2 text-center">
+            <span class="bg-gradient-to-r from-red-500 to-yellow-400 bg-clip-text text-transparent">Персональный</span> подход
+        </h2>
+        <p class="text-gray-400 text-center mb-12">Ваш фитнес-путь должен быть уникальным</p>
+        
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h3 class="text-2xl font-bold mb-4">Сфокусируйтесь на своем прогрессе</h3>
+                <p class="text-gray-300 mb-6">Каждый организм уникален. Мы поможем вам найти оптимальный путь к вашим целям без сравнения с другими.</p>
+                
+                <ul class="space-y-3 mb-6">
+                    <li class="flex items-start">
+                        <i class="fas fa-user-edit text-yellow-400 mt-1 mr-3"></i>
+                        <span>Возможность фиксировать и отслеживать тренировки</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-chart-line text-yellow-400 mt-1 mr-3"></i>
+                        <span>Отслеживание прогресса</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-dumbbell text-yellow-400 mt-1 mr-3"></i>
+                        <span>Адаптация под ваш уровень подготовки</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-heartbeat text-yellow-400 mt-1 mr-3"></i>
+                        <span>Мотивация</span>
+                    </li>
+                </ul>
+                
+                <div class="flex flex-col sm:flex-row gap-4">
+                    
+                <div class="text-center">
+    <a href="https://daria952.github.io/Personal-trainer/" 
+       target="_blank" 
+       class="inline-block border border-yellow-400 text-yellow-400 font-bold py-3 px-8 rounded-full hover:bg-yellow-400/10 transition flex items-center justify-center gap-2">
+        <i class="fas fa-chart-line"></i>
+        Трекер тренировок
+    </a>
+</div>
+                    <i class="fas fa-chart-line"></i>               
+                </div>
+            </div>
+            <div class="relative">
+                <div class="relative rounded-xl shadow-2xl overflow-hidden bg-gradient-to-br from-gray-900 to-black h-96 flex items-center justify-center">
+                    <div class="text-center p-6">
+                        <i class="fas fa-user-tie text-6xl text-yellow-400 mb-4"></i>
+                        <h4 class="text-xl font-bold mb-2">Ваш персональный результат</h4>
+                        <p class="text-gray-300">Программы, созданные специально под ваши цели и возможности</p>
+                    </div>
+                    <div class="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80')] bg-cover bg-center"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-16 text-center max-w-4xl mx-auto">
+            <h3 class="text-xl font-bold mb-6">Как это работает?</h3>
+            <div class="grid md:grid-cols-3 gap-6 text-left">
+                <div class="bg-gray-800/50 p-6 rounded-lg hover:bg-gray-800/70 transition">
+                    <div class="text-yellow-400 mb-3 text-2xl flex items-center justify-center w-12 h-12 bg-gray-900 rounded-full mx-auto">1</div>
+                    <h4 class="font-bold mb-3 text-center">Анализ ваших целей</h4>
+                    <p class="text-gray-300 text-sm text-center">Мы определяем ваши приоритеты: похудение, набор массы или поддержание формы</p>
+                </div>
+                <div class="bg-gray-800/50 p-6 rounded-lg hover:bg-gray-800/70 transition">
+                    <div class="text-yellow-400 mb-3 text-2xl flex items-center justify-center w-12 h-12 bg-gray-900 rounded-full mx-auto">2</div>
+                    <h4 class="font-bold mb-3 text-center">Оценка возможностей</h4>
+                    <p class="text-gray-300 text-sm text-center">Учитываем ваш график, доступ к оборудованию и уровень подготовки</p>
+                </div>
+                <div class="bg-gray-800/50 p-6 rounded-lg hover:bg-gray-800/70 transition">
+                    <div class="text-yellow-400 mb-3 text-2xl flex items-center justify-center w-12 h-12 bg-gray-900 rounded-full mx-auto">3</div>
+                    <h4 class="font-bold mb-3 text-center">Персональный план</h4>
+                    <p class="text-gray-300 text-sm text-center">Создаем программу, которая будет эффективной и комфортной именно для вас</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+ <script>
+        function calculateCalories() {
+            // Get form values
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+            const age = parseInt(document.getElementById('age').value);
+            const height = parseInt(document.getElementById('height').value);
+            const weight = parseInt(document.getElementById('weight').value);
+            const activity = parseFloat(document.getElementById('activity').value);
+            const goal = document.getElementById('goal').value;
+
+            // Validate inputs
+            if (!age || !height || !weight) {
+                alert('Пожалуйста, заполните все поля');
+                return;
+            }
+
+            // Calculate BMR (Basal Metabolic Rate)
+            let bmr;
+            if (gender === 'male') {
+                bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+            } else {
+                bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+            }
+
+            // Calculate TDEE (Total Daily Energy Expenditure)
+            const tdee = bmr * activity;
+
+            // Calculate goals
+            const maintenance = Math.round(tdee);
+            const weightLoss = Math.round(tdee * 0.85); // 15% deficit
+            const weightGain = Math.round(tdee * 1.15); // 15% surplus
+
+            // Calculate macros (40% protein, 30% fat, 30% carbs)
+            const proteinGrams = Math.round((weight * 2.2));
+            const proteinCals = proteinGrams * 4;
+            
+            const fatGrams = Math.round((tdee * 0.3) / 9);
+            const fatCals = fatGrams * 9;
+            
+            const carbsCals = tdee - proteinCals - fatCals;
+            const carbsGrams = Math.round(carbsCals / 4);
+
+            // Display results
+            document.getElementById('maintenance').textContent = maintenance;
+            document.getElementById('weightLoss').textContent = weightLoss;
+            document.getElementById('weightGain').textContent = weightGain;
+            
+            document.getElementById('proteinGrams').textContent = proteinGrams + 'г';
+            document.getElementById('proteinCals').textContent = proteinCals + ' ккал';
+            
+            document.getElementById('fatGrams').textContent = fatGrams + 'г';
+            document.getElementById('fatCals').textContent = fatCals + ' ккал';
+            
+            document.getElementById('carbsGrams').textContent = carbsGrams + 'г';
+            document.getElementById('carbsCals').textContent = carbsCals + ' ккал';
+
+            // Show results
+            document.getElementById('result').classList.remove('hidden');
+            
+            // Scroll to results
+            document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+        }        
+    
+    document.getElementById('mobileMenuButton').addEventListener('click', function() {
+    document.getElementById('mobileMenu').classList.toggle('active');
+  });
+</script>
+   
+</html>
